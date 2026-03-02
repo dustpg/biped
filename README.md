@@ -1,7 +1,5 @@
 ![Biped](biped.svg)
 
-# Biped
-
 **2D Dynamic Texture Atlas Caching Algorithm**
 
 ---
