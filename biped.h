@@ -129,17 +129,7 @@ biped_cache_lock_key(biped_cache_ctx_t ctx, const uint32_t key[], biped_block_in
  */
 biped_result_t
 biped_cache_lock_key_value(biped_cache_ctx_t ctx, biped_size2d_t size, const uint32_t key_value[], biped_block_info_t* info) biped_noexcept;
-#if 0
-/**
- * @brief Get block information by ID
- * @param ctx Cache context handle
- * @param id Block ID
- * @param[out] info Block information output, cannot be NULL
- * @return true if id is valid, false otherwise
- */
-bool
-biped_get_block_info(biped_cache_ctx_t ctx, biped_index_t id, biped_block_info_t* info) biped_noexcept;
-#endif
+
 /**
  * @brief Decrease lock counter for items with specified IDs
  * @param ctx Cache context handle
@@ -177,6 +167,12 @@ biped_cache_force_unlock(biped_cache_ctx_t ctx) biped_noexcept;
 #ifndef biped_hash
 #define biped_hash biped_hash_impl
 #endif
+#ifndef biped_min_w
+#define biped_min_w (biped_unit_t)1
+#endif
+#ifndef biped_min_h
+#define biped_min_h (biped_unit_t)2
+#endif
 
 #include <string.h>
 #include <assert.h>
@@ -205,7 +201,7 @@ biped_cache_force_unlock(biped_cache_ctx_t ctx) biped_noexcept;
 #define biped_alignas(x) _Alignas(x)
 #endif
 
-    // Count leading zeros
+// Count leading zeros
 static inline uint32_t
 biped_leading_zeros_u32(uint32_t v) biped_noexcept {
 #ifdef _MSC_VER
@@ -759,8 +755,8 @@ biped_cache_lock_key_value(biped_cache_ctx_t ctx, biped_size2d_t size, const uin
     assert(biped_is_success(biped_cache_lock_key(ctx, key_value, info)) == false);
 
     biped_size2d_t clamped;
-    clamped.w = biped_max(size.w, (biped_unit_t)1);
-    clamped.h = biped_max(size.h, (biped_unit_t)2);
+    clamped.w = biped_max(size.w, biped_min_w);
+    clamped.h = biped_max(size.h, biped_min_h);
     const uint16_t l = (uint16_t)biped_to_level(clamped);
     if (l > ctx->max_Level)
         return biped_result_out_of_cache;
@@ -1529,4 +1525,41 @@ uint32_t biped_hash_impl(const uint32_t key[], uint32_t count) biped_noexcept {
     const uint32_t code = biped_wyhash32(key, count, 0);
     return code;
 }
+
+
+// ----------------------------------------------------------------------------
+//                               inner function
+// ----------------------------------------------------------------------------
+
+
+biped_result_t
+biped_cache_get_info(biped_cache_ctx_t ctx, biped_index_t id, biped_block_info_t* info) biped_noexcept {
+    assert(ctx && info);
+    const biped_node_ctx node_ctx = biped_get_node_ctx(ctx);
+    biped_node_t* const node = biped_get_node(node_ctx, id);
+
+    const uint32_t length_of_key = ctx->length_of_key;
+    info->position = node->pos;
+    info->aligned_size = biped_to_size(node->level);
+    info->real_size = node->real;
+    info->id = id;
+    info->value = node->key_value + length_of_key;
+
+    return biped_result_valid;
+}
+
+
+uint32_t* 
+biped_shrink_size(biped_cache_ctx_t ctx, biped_index_t id, biped_size2d_t size) biped_noexcept {
+    const biped_node_ctx node_ctx = biped_get_node_ctx(ctx);
+    biped_node_t* const node = biped_get_node(node_ctx, id);
+    if (node->real.w >= size.w && node->real.h >= size.h) {
+        node->real = size;
+    }
+    return node->key_value;
+
+}
+
+
+
 #endif
