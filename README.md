@@ -20,6 +20,44 @@ Inspired by the **Buddy algorithm**, Biped supports node splitting and merging f
 **Limitations:**
 - Relatively lower space utilization compared to some packing algorithms
 
+**Documentation:** [Algorithm Details (English)](algorithm.md) | [算法说明 (中文)](algorithm.zh-cn.md)
+
+---
+
+## Usage
+
+Header-only library. Include `biped.h` in your project.
+
+In **one** compilation unit, define `BIPED_C_IMPLEMENTATION` before including the header:
+
+```c
+#define BIPED_C_IMPLEMENTATION
+#include "biped.h"
+```
+
+### Customizable Macros
+
+Override these macros **before** including `biped.h` to customize memory allocation and hashing:
+
+| Macro | Default | Description |
+|-------|---------|-------------|
+| `biped_malloc` | `malloc` | Memory allocation |
+| `biped_free` | `free` | Memory deallocation |
+| `biped_realloc` | `realloc` | Memory reallocation |
+| `biped_hash` | `biped_hash_impl` | Hash function for keys |
+
+Example:
+
+```c
+#define biped_malloc my_malloc
+#define biped_free my_free
+#define biped_realloc my_realloc
+#define biped_hash my_hash_function
+
+#define BIPED_C_IMPLEMENTATION
+#include "biped.h"
+```
+
 ---
 
 ## Use Cases
@@ -65,6 +103,44 @@ Test environment: MSVC, small object allocation with `free(malloc(211))`. Below 
 **特点**: 基于 2 幂次尺寸的 Atlas 纹理, 通过 Size Class Level 将图块分级, 结合 MAP/BASE/LEVEL 等结构实现分配与回收.
 
 **局限**: 空间利用率相对不高.
+
+**文档:** [算法说明 (中文)](algorithm.zh-cn.md) | [Algorithm Details (English)](algorithm.md)
+
+---
+
+## 用法
+
+Header-only 风格库. 在项目中包含 `biped.h` 即可.
+
+在**一个**编译单元中, 在包含头文件前定义 `BIPED_C_IMPLEMENTATION`:
+
+```c
+#define BIPED_C_IMPLEMENTATION
+#include "biped.h"
+```
+
+### 可覆盖的宏
+
+在包含 `biped.h` **之前**定义以下宏以自定义内存分配和哈希函数:
+
+| 宏 | 默认值 | 说明 |
+|----|--------|------|
+| `biped_malloc` | `malloc` | 内存分配 |
+| `biped_free` | `free` | 内存释放 |
+| `biped_realloc` | `realloc` | 内存重分配 |
+| `biped_hash` | `biped_hash_impl` | 键的哈希函数 |
+
+示例:
+
+```c
+#define biped_malloc my_malloc
+#define biped_free my_free
+#define biped_realloc my_realloc
+#define biped_hash my_hash_function
+
+#define BIPED_C_IMPLEMENTATION
+#include "biped.h"
+```
 
 ---
 
