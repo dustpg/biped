@@ -22,6 +22,9 @@ Inspired by the **Buddy algorithm**, Biped supports node splitting and merging f
 
 **Documentation:** [Algorithm Details (English)](algorithm.md) | [算法说明 (中文)](algorithm.zh-cn.md)
 
+
+![Biped](animation.gif)
+
 ---
 
 ## Usage
