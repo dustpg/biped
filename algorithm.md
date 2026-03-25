@@ -150,7 +150,7 @@ ALGORITHM B(key, width, height, lv)
 
 ### 5.3 Behavior C (Combine) - Merge Small Blocks in Same Region
 
-- **Time complexity**: Approximately \(O(N)\) (assuming single eviction is \(O(1)\)); if single eviction is \(O(N)\), total is approximately \(O(N \log N)\), where \(K\) is the number of evicted nodes, approximately \(\log N\). More precisely: \(O(2N + K \cdot \text{Evict})\).
+- **Time complexity**: Approximately \(O(N)\) (assuming single eviction is \(O(1)\)); if single eviction is \(O(N)\), total is approximately \(O(K \log N)\), where \(K\) is the number of evicted nodes, approximately \(\log N\). More precisely: \(O(2N + K \cdot \text{Evict})\).
 - **Approach**:
   - Maintain a temporary table \(M[\ ]\) of size \((W/w) \times (H/h)\), representing accumulated area for each region at the target size.
   - Traverse BASE from cold to hot, accumulating area by region. When a region's area \(\ge\) target area, that region can be merged; record position and index.
